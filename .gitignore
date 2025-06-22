@@ -1,0 +1,23 @@
+# Node (server + Vite)
+node_modules/
+dist/
+.env
+server/.env
+
+# Vite build
+client/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+ml-model/.env
+ml-model/*.pkl
+
+# OS
+.DS_Store
+Thumbs.db
