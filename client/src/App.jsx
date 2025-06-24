@@ -3,17 +3,23 @@ import {useState} from 'react';
 
 function App(){
   const [form, setForm] = useState({
-    span_length: '',
-    material: "concrete", //default option
-    num_lanes:'',
-    traffic_load: ''
+    age: '',
+    material: '',
+    length: '',
+    width: '',
+    height: '',
+    traffic_volume: '',
+    weather_conditions: '',
+    water_flow_rate: ''
   });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const [prediction, setPrediction] = useState(null);
+  const [result, setResult] = useState(null);
+
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // prevents page reload
@@ -26,21 +32,13 @@ function App(){
         body: JSON.stringify(form)
       });
 
-      const predictionData = await predictionRes.json();
-    const predictedLoad = predictionData.predicted_max_load;
-
-    //  Combine form + prediction into one object
-    const fullData = { ...form, predicted_max_load: predictedLoad };
-
-    //  Save this to MongoDB via /api/submit
-    await fetch("http://localhost:5000/api/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(fullData)
-    });
+      const data = await res.json();
+      console.log("📦 Result from Express:", data);
 
     //  Show the prediction
-    setPrediction(predictedLoad);
+      setResult(data);
+
+
   } catch (err) {
     console.error(" Error submitting data:", err);
   }
@@ -52,47 +50,112 @@ function App(){
     <div>
       <h1>Bridge Load Estimator</h1>
       <form onSubmit={handleSubmit}>
-        <label>Span Length (in meters):</label>
-        <input 
-          type="number"
-          name="span_length"
-          value={form.span_length}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <label>Material:</label>
-        <select
-          name="material"
-          value={form.material}
-          onChange={handleChange}
-        >
-          <option value="concrete">Concrete</option>
-          <option value="steel">Steel</option>
-        </select>  
-        <br />
-        <label>Number of Lanes:</label>
+      <label>
+        Age (years):
         <input
           type="number"
-          name="num_lanes"
-          value={form.num_lanes}
+          name="age"
+          value={form.age}
           onChange={handleChange}
           required
         />
-        <br />
-        <label>Traffic Load (in tonnes/day):</label>
+      </label>
+      <br />
+
+      <label>
+        Material:
+        <select name="material" value={form.material} onChange={handleChange} required>
+          <option value="">--Select Material--</option>
+          <option value="Steel">Steel</option>
+          <option value="Concrete">Concrete</option>
+          <option value="Wood">Wood</option>
+        </select>
+      </label>
+      <br />
+
+      <label>
+        Length (m):
         <input
           type="number"
-          name="traffic_load"
-          value={form.traffic_load}
+          name="length"
+          value={form.length}
           onChange={handleChange}
           required
         />
-        <br />
-        <button type="submit">Predict</button>
-      </form>
-      {prediction && (<p>🔮 Predicted Max Load Capacity: <strong>{prediction}</strong> tonnes</p>
+      </label>
+      <br />
+
+      <label>
+        Width (m):
+        <input
+          type="number"
+          name="width"
+          value={form.width}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      <label>
+        Height (m):
+        <input
+          type="number"
+          name="height"
+          value={form.height}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      <label>
+        Traffic Volume (vehicles/day):
+        <input
+          type="number"
+          name="traffic_volume"
+          value={form.traffic_volume}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      <label>
+        Weather Conditions:
+        <select name="weather_conditions" value={form.weather_conditions} onChange={handleChange} required>
+          <option value="">--Select Weather--</option>
+          <option value="Sunny">Sunny</option>
+          <option value="Rainy">Rainy</option>
+          <option value="Cloudy">Cloudy</option>
+        </select>
+      </label>
+      <br />
+
+      <label>
+        Water Flow Rate (m³/s):
+        <input
+          type="number"
+          name="water_flow_rate"
+          value={form.water_flow_rate}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      <button type="submit">Predict & Save</button>
+    </form>
+
+    {result && (
+      <div style={{ marginTop: "2rem", padding: "1rem", border: "1px solid gray" }}>
+        <h2>🔮 Prediction Result</h2>
+        <p><strong>Predicted Max Load:</strong> {result.predicted_max_load} tonnes</p>
+        <p><strong>Failure Probability:</strong> {result.failure_probability * 100}%</p>
+        <p><strong>Maintenance Urgency:</strong> {result.maintenance_urgency} !</p>
+      </div>
     )}
+
 
     </div>
   );

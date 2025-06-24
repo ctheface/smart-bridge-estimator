@@ -1,15 +1,19 @@
 const mongoose = require('mongoose');
 
-const BridgeInputSchema= new mongoose.Schema({
-    span_length: Number,
-    material: String,
-    num_lanes: Number,
-    traffic_load: Number,
-    predicted_max_load: Number,  // optional field to store model output
-    created_at:{
-        type: Date,
-        default: Date.now
-    }
+const BridgeInputSchema = new mongoose.Schema({
+  age: Number,
+  material: String,
+  length: Number,
+  width: Number,
+  height: Number,
+  traffic_volume: Number,
+  weather_conditions: String,
+  water_flow_rate: Number,
+  predicted_max_load: Number,
+  failure_probability: Number,
+  maintenance_urgency: String,
+  createdAt: { type: Date, default: Date.now }
 });
 
-module.exports=mongoose.model('BridgeInput', BridgeInputSchema);
+
+module.exports = mongoose.model('BridgeInput', BridgeInputSchema);

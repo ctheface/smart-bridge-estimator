@@ -23,12 +23,49 @@ app.post('/api/predict', async (req, res) => {
 
     // Send it to FastAPI running at port 8000
     const response = await axios.post('http://127.0.0.1:8000/predict', inputData);
+    
 
+
+    console.log("📦 Response from FastAPI:", response.data);
     // FastAPI returns: { predicted_max_load: ... }
-    const prediction = response.data;
+    
 
-    // Send that prediction back to React
-    res.json(prediction);
+    
+    // 1. Extract predicted_max_load from response
+    const predicted_max_load = response.data.predicted_max_load;
+    
+
+    const t = inputData.traffic_volume;
+
+    
+    // 2. Derive failure_probability and maintenance_urgency
+    let failure_probability = 0;
+    let maintenance_urgency = "Low";
+
+
+    if (predicted_max_load < t * 2) {
+      failure_probability = 1;
+      maintenance_urgency = "High";
+    } else if (predicted_max_load < t * 3) {
+      failure_probability = 0.5;
+      maintenance_urgency = "Medium";
+    }
+
+    // 3. Save all values to MongoDB
+    const newEntry = new BridgeInput({
+      ...inputData,
+      predicted_max_load,
+      failure_probability,
+      maintenance_urgency
+    });
+
+    await newEntry.save();
+
+    
+
+    // 4. Send all predictions back to frontend
+    res.json({ predicted_max_load, failure_probability, maintenance_urgency });
+
   } catch (error) {
     console.error('❌ Error calling ML API:', error.message);
     res.status(500).json({ error: 'ML prediction failed' });
@@ -36,16 +73,7 @@ app.post('/api/predict', async (req, res) => {
 });
 
 
-app.post('/api/submit', async (req, res) => {
-  try {
-    const input = new BridgeInput(req.body);
-    await input.save();
-    res.json({ message: '✅ Data saved successfully!' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: '❌ Failed to save data' });
-  }
-});
+
 
 
 
