@@ -17,6 +17,8 @@ mongoose.connect(process.env.MONGO_URI)
 const BridgeInput = require('./models/BridgeInput');
 
 app.post('/api/predict', async (req, res) => {
+  let predicted_max_load; // declare it before the try block
+
   try {
     // This is the form data from React
     const inputData = req.body;
@@ -31,14 +33,14 @@ app.post('/api/predict', async (req, res) => {
     
 
     
-    // 1. Extract predicted_max_load from response
-    const predicted_max_load = response.data.predicted_max_load;
+    // Extract predicted_max_load from response
+    predicted_max_load = response.data.predicted_max_load;
     
 
     const t = inputData.traffic_volume;
 
     
-    // 2. Derive failure_probability and maintenance_urgency
+    // Derive failure_probability and maintenance_urgency
     let failure_probability = 0;
     let maintenance_urgency = "Low";
 
@@ -51,7 +53,7 @@ app.post('/api/predict', async (req, res) => {
       maintenance_urgency = "Medium";
     }
 
-    // 3. Save all values to MongoDB
+    // Save all values to MongoDB
     const newEntry = new BridgeInput({
       ...inputData,
       predicted_max_load,
@@ -63,7 +65,7 @@ app.post('/api/predict', async (req, res) => {
 
     
 
-    // 4. Send all predictions back to frontend
+    //  Send all predictions back to frontend
     res.json({ predicted_max_load, failure_probability, maintenance_urgency });
 
   } catch (error) {
