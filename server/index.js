@@ -22,7 +22,7 @@ app.post('/api/predict', async (req, res) => {
 
     // Send to FastAPI
     const response = await axios.post('http://127.0.0.1:8000/predict', inputData);
-    const { predicted_stress, predicted_strain, predicted_tensile_strength, collapse_risk, confidence } = response.data;
+    const { predicted_stress, predicted_strain, predicted_tensile_strength, collapse_risk, probability_of_collapse } = response.data;
     console.log('📦 Received response from FastAPI:', response.data);
     // Save all to MongoDB
     const newEntry = new BridgeInput({
@@ -31,7 +31,7 @@ app.post('/api/predict', async (req, res) => {
       predicted_strain,
       predicted_tensile_strength,
       collapse_risk,
-      confidence
+      probability_of_collapse
     });
 
     await newEntry.save();
