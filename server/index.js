@@ -17,56 +17,27 @@ mongoose.connect(process.env.MONGO_URI)
 const BridgeInput = require('./models/BridgeInput');
 
 app.post('/api/predict', async (req, res) => {
-  let predicted_max_load; // declare it before the try block
-
-  try {
-    // This is the form data from React
+   try {
     const inputData = req.body;
 
-    // Send it to FastAPI running at port 8000
+    // Send to FastAPI
     const response = await axios.post('http://127.0.0.1:8000/predict', inputData);
-    
-
-
-    console.log("📦 Response from FastAPI:", response.data);
-    // FastAPI returns: { predicted_max_load: ... }
-    
-
-    
-    // Extract predicted_max_load from response
-    predicted_max_load = response.data.predicted_max_load;
-    
-
-    const t = inputData.traffic_volume;
-
-    
-    // Derive failure_probability and maintenance_urgency
-    let failure_probability = 0;
-    let maintenance_urgency = "Low";
-
-
-    if (predicted_max_load < t * 2) {
-      failure_probability = 1;
-      maintenance_urgency = "High";
-    } else if (predicted_max_load < t * 3) {
-      failure_probability = 0.5;
-      maintenance_urgency = "Medium";
-    }
-
-    // Save all values to MongoDB
+    const { predicted_stress, predicted_strain, predicted_tensile_strength, collapse_risk, confidence } = response.data;
+    console.log('📦 Received response from FastAPI:', response.data);
+    // Save all to MongoDB
     const newEntry = new BridgeInput({
       ...inputData,
-      predicted_max_load,
-      failure_probability,
-      maintenance_urgency
+      predicted_stress,
+      predicted_strain,
+      predicted_tensile_strength,
+      collapse_risk,
+      confidence
     });
 
     await newEntry.save();
 
-    
-
-    //  Send all predictions back to frontend
-    res.json({ predicted_max_load, failure_probability, maintenance_urgency });
+    // Return predictions to React
+    res.json({ predicted_stress, predicted_strain, predicted_tensile_strength, collapse_risk, probability_of_collapse });
 
   } catch (error) {
     console.error('❌ Error calling ML API:', error.message);

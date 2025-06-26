@@ -10,7 +10,13 @@ function App(){
     height: '',
     traffic_volume: '',
     weather_conditions: '',
-    water_flow_rate: ''
+    water_flow_rate: '',
+    rainfall: '',
+    material_composition: '',
+    bridge_design: '',
+    construction_quality: '',
+    temperature: '',
+    humidity: ''
   });
 
   const handleChange = (e) => {
@@ -128,6 +134,8 @@ function App(){
           <option value="Sunny">Sunny</option>
           <option value="Rainy">Rainy</option>
           <option value="Cloudy">Cloudy</option>
+          <option value="Windy">Windy</option>
+          <option value="Snowy">Snowy</option>
         </select>
       </label>
       <br />
@@ -143,18 +151,84 @@ function App(){
         />
       </label>
       <br />
+      <label>
+        Rainfall (mm):
+        <input type="number" 
+        name="rainfall" 
+        value={form.rainfall} 
+        onChange={handleChange} 
+        required 
+        />
+      </label>
+      <br />
 
-      <button type="submit">Predict & Save</button>
+      <label>
+        Material Composition:
+        <select name="material_composition" value={form.material_composition} onChange={handleChange} required>
+          <option value="">--Select--</option>
+          <option value="Steel 70%, Concrete 30%">Steel 70%, Concrete 30%</option>
+          <option value="Concrete 80%, Wood 20%">Concrete 80%, Wood 20%</option>
+        </select>
+      </label>
+      <br />
+
+      <label>
+        Bridge Design:
+        <select name="bridge_design" value={form.bridge_design} onChange={handleChange} required>
+          <option value="">--Select--</option>
+          <option value="Truss">Truss</option>
+          <option value="Arch">Arch</option>
+          <option value="Beam">Beam</option>
+        </select>
+      </label>
+      <br />
+
+      <label>
+        Construction Quality:
+        <select name="construction_quality" value={form.construction_quality} onChange={handleChange} required>
+          <option value="">--Select--</option>
+          <option value="Good">Good</option>
+          
+        </select>
+      </label>
+      <br />
+
+      <label>
+        Temperature (°C):
+        <input 
+        type="number" 
+        name="temperature" 
+        value={form.temperature} 
+        onChange={handleChange} 
+        required />
+      </label>
+      <br />
+
+      <label>
+        Humidity (%):
+        <input 
+        type="number" 
+        name="humidity" 
+        value={form.humidity} 
+        onChange={handleChange} 
+        required 
+        />
+      </label>
+      <br />
+
+      <button type="submit">Predict</button>
     </form>
 
     {result && (
-      <div style={{ marginTop: "2rem", padding: "1rem", border: "1px solid gray" }}>
-        <h2>🔮 Prediction Result</h2>
-        <p><strong>Predicted Max Load:</strong> {result.predicted_max_load} tonnes</p>
-        <p><strong>Failure Probability:</strong> {result.failure_probability * 100}%</p>
-        <p><strong>Maintenance Urgency:</strong> {result.maintenance_urgency} !</p>
-      </div>
-    )}
+        <div style={{ marginTop: "2rem", border: "1px solid #ccc", padding: "1rem", borderRadius: "8px" }}>
+          <h2>🔮 Prediction Result</h2>
+          <p><strong>Stress:</strong> {result.predicted_stress} MPa</p>
+          <p><strong>Strain:</strong> {result.predicted_strain} %</p>
+          <p><strong>Tensile Strength:</strong> {result.predicted_tensile_strength} MPa</p>
+          <p><strong>Collapse Risk:</strong> {result.collapse_risk === 1 ? "⚠️ Yes" : "✅ No"}</p>
+          <p><strong>Probability of Collapse:</strong> {result.probability_of_collapse}%</p>
+        </div>
+      )}
 
 
     </div>
